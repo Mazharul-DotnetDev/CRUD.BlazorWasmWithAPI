@@ -1,0 +1,72 @@
+﻿@inject ProductCategoryService service
+@page "/cat"
+
+<h2>Category List</h2>
+
+<NavLink class="nav-link" href="/add">Add Category</NavLink>
+
+<table class="table table-responsive table-striped table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var cat in data)
+        {
+            <tr>
+                <td>@cat.ProductCategoryID</td>
+                <td>@cat.Name</td>
+                <td>
+                    <ol>
+                        @foreach (var product in cat.Products)
+                        {
+                            <li>
+                                <dl>
+                                    <dt>Name</dt>
+                                    <dd>@product.Name</dd>
+                                    <dt>Number</dt>
+                                    <dd>@product.ProductNumber</dd>
+                                    <dt>Color</dt>
+                                    <dd>@product.Color</dd>
+                                </dl>
+                            </li>
+                        }
+                    </ol>
+                </td>
+
+                <td class="btn-group">
+                    <a class="nav-link btn btn-outline-info" href="/edit/@cat.ProductCategoryID">Edit</a>
+                    <button class="btn btn-outline-danger" @onclick= "() => DeleteData(cat)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    private ProductCategory[] data = new ProductCategory[0];
+    protected override async Task OnInitializedAsync()
+    {
+        // This is the "OnInitializedAsync" method, called after the component initializes.
+        // - "await base.OnInitializedAsync();" calls the base method for any default initialization.
+        // - "this.data = await this.service.GetProductCategories();" gets product categories from the service and stores them in "data".
+        // - "this.StateHasChanged();" tells Razor that the component's state has changed, triggering a re-render.
+         
+        await base.OnInitializedAsync();
+        this.data = await this.service.GetProductCategories();
+        this.StateHasChanged();
+    }
+
+    async Task DeleteData (ProductCategory productCategory)
+    {
+        await this.service.DeleteProductCategory(productCategory.ProductCategoryID);
+        this.StateHasChanged();
+    }
+
+}

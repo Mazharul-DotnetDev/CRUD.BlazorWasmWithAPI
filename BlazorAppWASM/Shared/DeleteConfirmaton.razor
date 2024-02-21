@@ -1,0 +1,15 @@
+﻿@typeparam ModelType
+
+<h3>DeleteConfirmaton</h3>
+
+@code {
+
+    [Parameter]
+    public ModelType Model { get; set; }
+    [Parameter]
+    public EventCallback<bool> Success { get; set; }
+
+}
+
+
+@* This code snippet defines a reusable component called "DeleteConfirmaton" that can be used to display a confirmation dialog for deleting any model object. It receives the model object itself (Model) and a callback function (Success) to handle user confirmation or cancellation. The generic type parameter ModelType allows it to work with various model types dynamically. *@

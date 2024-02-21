@@ -1,0 +1,89 @@
+﻿@page "/add"
+@inject ProductCategoryService service
+@inject NavigationManager nav
+
+<form @onsubmit="SaveData">
+    @* !string.IsNullOrEmpty(message) means "not null or empty" *@
+
+    @* The expression !string.IsNullOrEmpty(message) is commonly used in C# and similar languages to check if a given string variable is either empty or null. Here's a breakdown:
+
+    !: This is the logical NOT operator. It inverts the result of the following expression.
+    string.IsNullOrEmpty(message): This checks if the message variable is either:
+    Empty: This means the string has no characters, including spaces.
+    Null: This means the variable doesn't point to any valid string object.
+    So, the entire expression translates to:
+
+    !string.IsNullOrEmpty(message): If the message is not empty or null, then the expression is true. Otherwise, it's false.
+    In simpler terms, it checks if you have a valid, non-empty string in the message variable. This is often used in conditional statements to:
+
+    Display an error message if the string is empty or null.
+    Proceed with an operation only if a valid string is provided.
+    Validate user input in forms. *@
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <span class="text-danger text-lg-center">@message</span>
+    }
+    <div>
+        @* The for attribute value should match the id attribute value of the associated input field. *@
+    <label for="name" class="link-success">Product Category Name:</label>
+    <input id="name" class="form-control" required @bind="model.Name" />
+    </div>
+
+    <table class="table table-active table-bordered table-hover">
+      <tr>
+            <th>Product Name</th>
+          <th>Product Number</th>
+            <th>Product Color</th>
+            <th><button type="button" class="btn btn-outline-info" @onclick="AddProduct">Add Product</button></th>>
+      </tr>
+        @foreach (var prod in model.Products)
+        {
+            <tr>
+                <td>
+                    <input @bind="prod.Name" />
+                </td>
+                <td>
+                    <input @bind="prod.ProductNumber" />
+                </td>
+                <td>
+                    <input @bind="prod.Color" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-outline-warning" @onclick="()=>DeleteProduct(prod) ">Delete</button>
+                </td>
+            </tr>
+        }
+    </table>
+    <button type="submit" class="btn btn-outline-success">Save</button>
+    <NavLink class="btn btn-outline-info" href="cat">Cancel</NavLink>
+</form>
+
+@code {
+    private ProductCategory model = new ProductCategory();
+    //int index = 0;
+    string? message;
+
+    public async Task SaveData()
+    {
+        var response = await service.SaveProductCategory(model);
+        if (response.IsSuccessStatusCode)
+        {
+            nav.NavigateTo("/cat");
+        }
+        else
+        {
+            this.message = response.ReasonPhrase;
+        }
+        
+    }
+    void AddProduct()
+    {
+        model.Products.Add(new Product());
+    }
+
+    void DeleteProduct(Product item)
+    {
+        model.Products.Remove(item);
+    }
+}

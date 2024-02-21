@@ -1,0 +1,93 @@
+﻿@page "/edit/{catId:int}"
+@inject ProductCategoryService service
+@inject NavigationManager nav 
+
+
+<EditForm Model="productCategory" OnInvalidSubmit="SaveData">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" required @bind-Value="productCategory.Name" ></InputText>
+        <ValidationMessage For="()=> productCategory.Name" />
+    </div>
+
+    <table class="table table-active table-bordered table-hover">
+        <tr>
+            <th>Product Name</th>
+            <th>Product Number</th>
+            <th>Product Color</th>
+            <th><button type="button" class="btn btn-outline-info" @onclick="AddProduct">Add Product</button></th>
+        </tr>
+
+        @foreach (var prod in productCategory.Products)
+        {
+            <tr>
+                <td>
+                    <InputText id="name" class="form-control" @bind-Value="prod.Name"></InputText>
+                    <ValidationMessage For="()=>prod.Name" />
+                </td>
+                <td>
+                    <InputText id="name" class="form-control" @bind-Value="prod.ProductNumber"></InputText>
+                    <ValidationMessage For="()=>prod.ProductNumber" />
+                </td>
+                <td>
+                    <InputText id="name" class="form-control" @bind-Value="prod.Color"></InputText>
+                    <ValidationMessage For="()=>prod.Color" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-outline-warning" @onclick="()=> DeleteProduct(prod)" >Delete</button>
+                </td>
+            </tr>
+        }
+    </table>
+
+    <button type="submit" class="btn btn-outline-success">Save</button>
+    <button type="button" class="btn btn-outline-warning" @onclick="DataDelete" >Delete</button>
+    <NavLink class="btn btn-outline-info" href="cat">Cancel</NavLink>
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int catId { get; set; }
+    private ProductCategory productCategory = new ProductCategory();
+    protected override async Task OnInitializedAsync()
+    {
+        this.productCategory = await this.service.GetProductCategory(catId);
+        await base.OnInitializedAsync();
+    }
+    public async Task SaveData()
+    {
+        var response = await service.UpdateProductCategory(productCategory);
+        if (response.IsSuccessStatusCode)
+        {
+            nav.NavigateTo("/cat");
+        }
+    }
+    void AddProduct()
+    {
+        productCategory.Products.Add(new Product());
+    }
+    void DeleteProduct(Product item)
+    {
+        productCategory.Products.Remove(item);
+    }
+    async Task DataDelete()
+    {
+        var response = await service.DeleteProductCategory(catId);
+        if (response.IsSuccessStatusCode)
+        {
+            nav.NavigateTo("/cat");
+        }
+    }
+
+}
+
+
+@* If you need to pass parameters or perform additional logic before invoking the method, use an anonymous method.
+If you simply need to invoke the method without any additional logic, directly bind the method to the event. *@
+
+@* Use <button type="submit">Save</button> when you want to submit form data to the server. This button is typically used inside a form element and is associated with form submission behavior.
+Use <button type="button">Delete</button> when you want to trigger a client-side action or perform some JavaScript function when clicked, without submitting any form data. This button is not associated with form submission behavior and is commonly used for actions such as deletion, navigation, or other client-side operations. *@
